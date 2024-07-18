@@ -8,6 +8,7 @@ on:
 jobs:
   check-admins:
     runs-on: ubuntu-latest
+    timeout-minutes: 15 # Increase this if necessary
 
     steps:
     - name: Checkout repository
@@ -27,4 +28,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
-      run: python utils/check_admins.py
+      run: |
+        python utils/check_admins.py
