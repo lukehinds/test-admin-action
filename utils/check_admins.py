@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
+import hcl2
 import os
-import json
 from github import Github
-from tfparse import load
 
-# Load GitHub token from environment variables
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-REPO_NAME = os.getenv('GITHUB_REPOSITORY')
+# Set your GitHub token and repository name here for testing
+# GITHUB_TOKEN = 'your_github_token'
+# REPO_NAME = 'your_username/your_repository'
 
 # Read the Terraform file
 terraform_file_path = 'iam/identity_center.tf'
@@ -15,13 +13,12 @@ if not os.path.exists(terraform_file_path):
     print(f"File not found: {terraform_file_path}")
     exit(1)
 
-# Parse the Terraform file using tfparse
 with open(terraform_file_path, 'r') as file:
-    config = load(file)
+    content = hcl2.load(file)
 
 # Extract sso_accounts from locals
-locals_block = config['locals'][0]
-sso_accounts = locals_block['sso_accounts']
+locals_block = content.get('locals', [{}])[0]
+sso_accounts = locals_block.get('sso_accounts', {})
 
 if not sso_accounts:
     raise ValueError("sso_accounts not found in the locals block")
@@ -47,22 +44,20 @@ if admin_users:
             issue_body += f"| @{username} | {full_name} |\n"
     
     issue_body += (
-        "\nPlease review the list and ensure that it is up-to-date. "
-        "If there are any discrepancies, kindly update the Terraform configuration. 🛠️\n\n"
-        "Have a great week! ✨"
+        "\nPlease review if you still have a need for admin access, and if not kindly update the Terraform configuration and remove the flag. 🛠️\n\n"
     )
 
     print(issue_body)
     
     # Initialize GitHub client
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(REPO_NAME)
+    # g = Github(GITHUB_TOKEN)
+    # repo = g.get_repo(REPO_NAME)
     
-    # Create a new issue
-    repo.create_issue(
-        title=issue_title,
-        body=issue_body
-    )
-    print(f"Issue created successfully in repository {REPO_NAME}")
+    # # Create a new issue
+    # repo.create_issue(
+    #     title=issue_title,
+    #     body=issue_body
+    # )
+    # print(f"Issue created successfully in repository {REPO_NAME}")
 else:
     print("No admin users found")
