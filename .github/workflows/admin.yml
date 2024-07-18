@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install python-hcl2 PyGithub
+        pip install tfparse PyGithub
 
     - name: Parse Terraform locals and create issue
       env:
@@ -29,9 +29,10 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
         #!/usr/bin/env python3
-        import hcl2
         import os
+        import json
         from github import Github
+        from tfparse import load
 
         # Load GitHub token from environment variables
         GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
@@ -44,12 +45,13 @@ jobs:
             print(f"File not found: {terraform_file_path}")
             exit(1)
 
+        # Parse the Terraform file using tfparse
         with open(terraform_file_path, 'r') as file:
-            content = hcl2.load(file)
+            config = load(file)
 
         # Extract sso_accounts from locals
-        locals_block = content.get('locals', [{}])[0]
-        sso_accounts = locals_block.get('sso_accounts', {})
+        locals_block = config['locals'][0]
+        sso_accounts = locals_block['sso_accounts']
 
         if not sso_accounts:
             raise ValueError("sso_accounts not found in the locals block")
