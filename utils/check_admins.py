@@ -3,8 +3,9 @@ import os
 from github import Github
 
 # Set your GitHub token and repository name here for testing
-# GITHUB_TOKEN = 'your_github_token'
-# REPO_NAME = 'your_username/your_repository'
+# Load GitHub token from environment variables
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+REPO_NAME = os.getenv('GITHUB_REPOSITORY')
 
 # Read the Terraform file
 terraform_file_path = 'iam/identity_center.tf'
@@ -50,14 +51,14 @@ if admin_users:
     print(issue_body)
     
     # Initialize GitHub client
-    # g = Github(GITHUB_TOKEN)
-    # repo = g.get_repo(REPO_NAME)
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(REPO_NAME)
     
     # # Create a new issue
-    # repo.create_issue(
-    #     title=issue_title,
-    #     body=issue_body
-    # )
-    # print(f"Issue created successfully in repository {REPO_NAME}")
+    repo.create_issue(
+        title=issue_title,
+        body=issue_body
+    )
+    print(f"Issue created successfully in repository {REPO_NAME}")
 else:
     print("No admin users found")
