@@ -28,6 +28,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
+        #!/usr/bin/env python3
         import hcl2
         import os
         from github import Github
