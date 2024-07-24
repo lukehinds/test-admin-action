@@ -14,10 +14,14 @@ if [ ! -f "$TERRAFORM_FILE_PATH" ]; then
     exit 1
 fi
 
+# Print the contents of the Terraform file for debugging
+echo "Contents of the Terraform file:"
+cat $TERRAFORM_FILE_PATH
+
 # Parse the Terraform file using jq
 CONTENT=$(cat $TERRAFORM_FILE_PATH)
-LOCALS_BLOCK=$(echo "$CONTENT" | jq -r '.locals[0]')
-SSO_ACCOUNTS=$(echo "$LOCALS_BLOCK" | jq -r '.sso_accounts')
+LOCALS_BLOCK=$(echo "$CONTENT" | jq -r '.locals[0]' || { echo "Error parsing locals block"; exit 1; })
+SSO_ACCOUNTS=$(echo "$LOCALS_BLOCK" | jq -r '.sso_accounts' || { echo "Error parsing sso_accounts"; exit 1; })
 
 if [ -z "$SSO_ACCOUNTS" ]; then
     echo "sso_accounts not found in the locals block"
