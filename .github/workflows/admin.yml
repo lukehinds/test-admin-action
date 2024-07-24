@@ -1,32 +1,27 @@
-name: Weekly Admin Check
+name: Weekly Admin Access Report
 
 on:
   schedule:
-    - cron: '0 0 * * 0' # Runs every Sunday at midnight
+    - cron: '0 0 * * 1'  # Runs every Monday at 00:00 UTC
   workflow_dispatch:
 
 jobs:
-  check-admins:
+  report:
     runs-on: ubuntu-latest
-    timeout-minutes: 15 # Increase this if necessary
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set up jq
+        run: sudo apt-get install jq
 
-    - name: Install dependencies
-      run: |
-        pip install python-hcl2 PyGithub
-        python -m pip install --upgrade pip
+      - name: Set up GitHub CLI
+        uses: cli/cli-action@v2
 
-    - name: Run check_admins script
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-      run: |
-        python utils/check_admins.py
+      - name: Run the script
+        run: |
+          chmod +x ./utils/admins.sh
+          ./utils/admins.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
