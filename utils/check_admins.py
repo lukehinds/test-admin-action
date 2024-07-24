@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import hcl2
 import os
 from github import Github
