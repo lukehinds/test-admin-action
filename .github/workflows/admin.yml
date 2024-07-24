@@ -15,9 +15,6 @@ jobs:
       - name: Set up jq
         run: sudo apt-get install jq
 
-      - name: Set up GitHub CLI
-        uses: cli/cli-action@v2
-
       - name: Run the script
         run: |
           chmod +x ./utils/admins.sh
